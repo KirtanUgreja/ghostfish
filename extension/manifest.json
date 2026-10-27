@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "Ghostfish",
+  "version": "0.1.0",
+  "description": "A whisper-quiet Stockfish arrow for chess.com and lichess.org: your best move, drawn right on the board.",
+  "permissions": [
+    "offscreen",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.chess.com/*",
+    "*://*.lichess.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Ghostfish",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "commands": {
+    "toggle": {
+      "suggested_key": {
+        "default": "Alt+Shift+A"
+      },
+      "description": "Toggle Ghostfish on/off"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.chess.com/*"
+      ],
+      "js": [
+        "content/fen.js",
+        "content/readers/chesscom.js",
+        "content/overlay.js",
+        "content/main.js"
+      ]
+    },
+    {
+      "matches": [
+        "*://*.lichess.org/*"
+      ],
+      "js": [
+        "content/fen.js",
+        "content/readers/lichess.js",
+        "content/overlay.js",
+        "content/main.js"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

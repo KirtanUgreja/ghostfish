@@ -1,0 +1,6 @@
+node_modules/
+.DS_Store
+.superpowers/
+# local AI-assistant guidance and design/plan notes
+CLAUDE.md
+docs/superpowers/

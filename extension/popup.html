@@ -1,0 +1,37 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="popup.css">
+<main>
+  <header>
+    <img src="icons/icon-48.png" alt="" width="36" height="36">
+    <div>
+      <h1>Ghostfish</h1>
+      <p>Stockfish 19, whispering your next move</p>
+    </div>
+  </header>
+
+  <label class="switch-row">
+    <span id="switch-label">Off</span>
+    <input type="checkbox" id="toggle" role="switch">
+    <span class="switch" aria-hidden="true"></span>
+  </label>
+
+  <section id="card" class="card" data-state="off">
+    <div class="card-label">Status</div>
+    <div id="move" class="move" hidden>
+      <div id="glyph" class="glyph"></div>
+      <div>
+        <div id="piece" class="piece"></div>
+        <div class="squares"><span id="from"></span><i>→</i><span id="to"></span></div>
+        <div id="note" class="note"></div>
+      </div>
+    </div>
+    <div id="text" class="text"></div>
+  </section>
+
+  <footer>
+    <span><kbd>Alt</kbd><kbd>Shift</kbd><kbd>A</kbd> toggles</span>
+    <span>Friendly games only</span>
+  </footer>
+</main>
+<script src="popup.js"></script>
