@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
-const { parseBestmove } = require('../extension/engine-util.js');
+const { parseBestmove, parseInfo } = require('../extension/engine-util.js');
 
 test('parseBestmove plain move with ponder', () => {
   assert.deepStrictEqual(parseBestmove('bestmove e2e4 ponder e7e5'), { from: 'e2', to: 'e4' });
@@ -13,6 +13,23 @@ test('parseBestmove drops promotion suffix', () => {
 
 test('parseBestmove (none) -> null', () => {
   assert.strictEqual(parseBestmove('bestmove (none)'), null);
+});
+
+test('parseInfo reads depth and centipawn score', () => {
+  assert.deepStrictEqual(parseInfo('info depth 12 seldepth 18 multipv 1 score cp 34 nodes 9000 pv e2e4 e7e5'), { depth: 12, cp: 34 });
+  assert.deepStrictEqual(parseInfo('info depth 9 score cp -120 nodes 1'), { depth: 9, cp: -120 });
+});
+
+test('parseInfo reads mate scores', () => {
+  assert.deepStrictEqual(parseInfo('info depth 20 score mate 3 nodes 5'), { depth: 20, mate: 3 });
+  assert.deepStrictEqual(parseInfo('info depth 20 score mate -2 nodes 5'), { depth: 20, mate: -2 });
+});
+
+test('parseInfo ignores bounds and non-score lines', () => {
+  assert.strictEqual(parseInfo('info depth 12 score cp 34 lowerbound nodes 1'), null);
+  assert.strictEqual(parseInfo('info depth 12 score cp 34 upperbound nodes 1'), null);
+  assert.strictEqual(parseInfo('info string NNUE evaluation using nn.bin'), null);
+  assert.strictEqual(parseInfo('bestmove e2e4'), null);
 });
 
 test('shipped engine returns a legal first move from the start position', async () => {

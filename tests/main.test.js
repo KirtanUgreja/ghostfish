@@ -36,14 +36,16 @@ function bumpBoard(doc) {
 }
 
 test('draws one arrow on the user turn and does not erase it or loop on its own DOM change', async () => {
-  const { doc, calls, statuses } = boot(() => ({ ok: true, from: 'g1', to: 'f3' }));
+  const { doc, calls, statuses } = boot(() => ({ ok: true, from: 'g1', to: 'f3', eval: { depth: 14, cp: 34 } }));
   await sleep(500);
   assert.deepStrictEqual(calls, [FEN_AFTER_E4_E5]);
-  assert.deepStrictEqual(JSON.parse(JSON.stringify(statuses.at(-1))), {
-    state: 'move',
-    text: 'Your move: Knight g1 → f3',
-    move: { piece: 'Knight', from: 'g1', to: 'f3', note: '' },
-  });
+  const st = JSON.parse(JSON.stringify(statuses.at(-1)));
+  assert.strictEqual(st.state, 'move');
+  assert.strictEqual(st.text, 'Your move: Knight g1 → f3');
+  assert.deepStrictEqual(st.move, { piece: 'Knight', from: 'g1', to: 'f3', note: '' });
+  assert.deepStrictEqual(st.eval, { depth: 14, cp: 34 });
+  assert.strictEqual(st.board.bottom, 'w');
+  assert.strictEqual(Object.keys(st.board.pieces).length, 32);
   assert.strictEqual(arrows(doc), 1);
   await sleep(500);
   assert.strictEqual(calls.length, 1);
@@ -92,4 +94,5 @@ test('status says when it is the opponent\'s turn', async () => {
   const { statuses } = boot(() => ({ ok: true, from: 'g1', to: 'f3' }), { flipped: true });
   await sleep(400);
   assert.strictEqual(statuses.at(-1).state, 'wait');
+  assert.strictEqual(statuses.at(-1).board.bottom, 'b');
 });

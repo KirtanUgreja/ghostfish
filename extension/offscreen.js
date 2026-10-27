@@ -4,6 +4,7 @@ const MOVETIME_MS = 1000;
 const worker = new Worker('engine/stockfish-19-lite-single.js');
 let running = null;
 let queued = null;
+let lastEval = null; // latest depth/score of the running search
 
 worker.postMessage('uci');
 worker.postMessage('isready');
@@ -12,12 +13,14 @@ function pump() {
   if (running || !queued) return;
   running = queued;
   queued = null;
+  lastEval = null;
   worker.postMessage('position fen ' + running.fen);
   worker.postMessage('go movetime ' + MOVETIME_MS);
 }
 
 worker.onmessage = (ev) => {
   const line = typeof ev.data === 'string' ? ev.data : '';
+  if (line.startsWith('info')) lastEval = EngineUtil.parseInfo(line) || lastEval;
   if (!line.startsWith('bestmove')) return;
   const done = running;
   running = null;
@@ -25,7 +28,7 @@ worker.onmessage = (ev) => {
   if (queued) done.resolve({ ok: true, stale: true });
   else {
     const mv = EngineUtil.parseBestmove(line);
-    done.resolve(mv ? { ok: true, ...mv } : { ok: true, none: true });
+    done.resolve(mv ? { ok: true, ...mv, eval: lastEval } : { ok: true, none: true });
   }
   pump();
 };

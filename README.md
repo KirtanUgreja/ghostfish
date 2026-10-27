@@ -12,19 +12,20 @@ Your best move, drawn right on the board.
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 ![Runs locally](https://img.shields.io/badge/runs-100%25%20locally-orange)
 
-<img src="docs/popup.png" width="300" alt="Ghostfish popup showing Knight g1 to f3">
+<img src="docs/popup-dark.png" width="280" alt="Ghostfish popup, dark theme: mini board with the best-move arrow, eval bar, Knight g1 to f3, +0.34"> <img src="docs/popup-light.png" width="280" alt="Ghostfish popup, light theme">
 
 </div>
 
 ## What it does
 
 Open a game, switch Ghostfish on, and on **your turn** it draws an orange arrow for the best move.
-The popup spells it out too: *Knight g1 → f3*, plus whether it captures or castles.
+The popup mirrors the board with the arrow and an eval bar, and spells it out: *Knight g1 → f3*, the engine's eval (`+0.34`, `#3` for forced mate) and search depth.
 
 - **Two sites:** chess.com and lichess.org (games, analysis boards, vs. computer).
 - **Real Stockfish:** the official engine, compiled to WebAssembly (Stockfish 19, lite NNUE build).
 - **Private:** the engine runs inside your browser. No server, no account, no network calls.
 - **Any Chromium browser:** Chrome, Brave, Edge, Arc.
+- **Looks the part:** an "ink and signal" design (warm neutrals, one vermilion accent) that follows your light/dark setting.
 - **Plays your side:** it follows the board orientation, so it works whether you're White or Black, and stays quiet on your opponent's turn.
 
 ## Install
@@ -94,6 +95,7 @@ extension/
     overlay.js         SVG arrow
     main.js            observer, debounce, glue
   engine/              stockfish-19-lite-single (.js + .wasm)
+  icons/               logo (icon.svg + PNGs) and pieces/ (cburnett SVG set)
 tests/                 node:test + jsdom
 ```
 
@@ -101,5 +103,6 @@ tests/                 node:test + jsdom
 
 - [Stockfish](https://github.com/official-stockfish/Stockfish) by the Stockfish developers.
 - [stockfish.js](https://github.com/nmrugg/stockfish.js) by Nathan Rugg, the WebAssembly build bundled in `extension/engine/`.
+- Chess pieces by [Colin M. L. Burnett](https://en.wikipedia.org/wiki/User:Cburnett) (GPLv2+), from the [Lichess piece set](https://github.com/lichess-org/lila/tree/master/public/piece/cburnett), in `extension/icons/pieces/`. The logo's knight is one of them.
 
-Both are GPL-3.0, so Ghostfish is too. See [LICENSE](LICENSE).
+All GPL, so Ghostfish is GPL-3.0. See [LICENSE](LICENSE).

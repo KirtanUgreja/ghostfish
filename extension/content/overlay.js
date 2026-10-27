@@ -2,6 +2,7 @@
 (function (root) {
   const NS = 'http://www.w3.org/2000/svg';
   const MARK = 'data-chess-arrow';
+  const SIGNAL = '#ff5a1f';
 
   // Centre of a square in the 8x8 viewBox, given which colour is at the bottom.
   function center(sq, bottomColor) {
@@ -39,13 +40,17 @@
       [MARK]: '1', viewBox: '0 0 8 8', preserveAspectRatio: 'none',
       style: 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:100;',
     });
-    const color = 'rgba(255,140,0,0.85)';
-    svg.appendChild(el('line', { x1: a.x, y1: a.y, x2: base.x, y2: base.y, stroke: color, 'stroke-width': 0.16, 'stroke-linecap': 'round' }));
     const p = (x, y) => x + ',' + y;
-    svg.appendChild(el('polygon', {
-      fill: color,
-      points: [p(b.x, b.y), p(base.x - uy * headHalf, base.y + ux * headHalf), p(base.x + uy * headHalf, base.y - ux * headHalf)].join(' '),
-    }));
+    const head = [p(b.x, b.y), p(base.x - uy * headHalf, base.y + ux * headHalf), p(base.x + uy * headHalf, base.y - ux * headHalf)].join(' ');
+    const g = el('g', { opacity: 0 });
+    g.appendChild(el('animate', { attributeName: 'opacity', from: 0, to: 1, dur: '0.18s', fill: 'freeze' }));
+    // dark halo first, then the signal-coloured arrow on top
+    g.appendChild(el('line', { x1: a.x, y1: a.y, x2: base.x, y2: base.y, stroke: 'rgba(0,0,0,.35)', 'stroke-width': 0.24, 'stroke-linecap': 'round' }));
+    g.appendChild(el('polygon', { points: head, fill: 'rgba(0,0,0,.35)', stroke: 'rgba(0,0,0,.35)', 'stroke-width': 0.08, 'stroke-linejoin': 'round' }));
+    g.appendChild(el('line', { x1: a.x, y1: a.y, x2: base.x, y2: base.y, stroke: SIGNAL, 'stroke-width': 0.16, 'stroke-linecap': 'round' }));
+    g.appendChild(el('polygon', { points: head, fill: SIGNAL }));
+    g.appendChild(el('circle', { cx: a.x, cy: a.y, r: 0.1, fill: '#fff' }));
+    svg.appendChild(g);
     mountEl.appendChild(svg);
   }
 

@@ -23,8 +23,9 @@
   const NAMES = { p: 'Pawn', n: 'Knight', b: 'Bishop', r: 'Rook', q: 'Queen', k: 'King' };
 
   // Shown in the extension popup. state: move | wait | think | idle | over | error
-  function setStatus(state, text, move) {
-    chrome.storage.local.set({ status: { state, text, move } }).catch(() => {});
+  function setStatus(state, text, pos, move, evalInfo) {
+    const board = pos && { pieces: pos.pieces, bottom: pos.bottomColor };
+    chrome.storage.local.set({ status: { state, text, move, board, eval: evalInfo } }).catch(() => {});
   }
 
   function describe(pos, from, to) {
@@ -39,10 +40,10 @@
     const pos = reader.read(document);
     if (!pos) { setStatus('idle', 'No board found'); return log('no board / unreadable'); }
     const { fen, sideToMove } = ChessFen.buildFen(pos);
-    if (sideToMove !== pos.bottomColor) setStatus('wait', 'Waiting for opponent');
+    if (sideToMove !== pos.bottomColor) setStatus('wait', 'Waiting for opponent', pos);
     if (sideToMove !== pos.bottomColor) return log('not your turn', { sideToMove, bottom: pos.bottomColor, lastMove: pos.lastMove });
     log('analysing', fen);
-    setStatus('think', 'Thinking…');
+    setStatus('think', 'Thinking…', pos);
 
     currentFen = fen;
     let res;
@@ -54,10 +55,10 @@
     }
     log('engine reply', res);
     if (!enabled || currentFen !== fen || !res || res.stale) return;
-    if (!res.ok) return setStatus('error', 'Engine error');
-    if (res.none) return setStatus('over', 'No legal move (game over?)');
+    if (!res.ok) return setStatus('error', 'Engine error', pos);
+    if (res.none) return setStatus('over', 'No legal move (game over?)', pos);
     const move = describe(pos, res.from, res.to);
-    setStatus('move', `Your move: ${move.piece} ${move.from} → ${move.to}`, move);
+    setStatus('move', `Your move: ${move.piece} ${move.from} → ${move.to}`, pos, move, res.eval);
     Overlay.draw(pos.mountEl, res.from, res.to, pos.bottomColor);
   }
 
